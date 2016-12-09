@@ -1,18 +1,26 @@
 buildscript {
     ext {
         springBootVersion = '1.4.2.RELEASE'
+        jooqPluginVersion = '2.0.2'
     }
     repositories {
         mavenCentral()
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("nu.studer:gradle-jooq-plugin:${jooqPluginVersion}")
+        classpath("gradle.plugin.com.boxfuse.client:flyway-release:4.0.3")
     }
 }
 
 apply plugin: 'java'
-apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'nu.studer.jooq'
+apply plugin: 'org.flywaydb.flyway'
 
 jar {
     baseName = 'code-review-automator'
@@ -27,6 +35,7 @@ repositories {
 
 
 dependencies {
+    jooqRuntime('com.h2database:h2')
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-starter-aop')
     compile('org.flywaydb:flyway-core')
@@ -36,3 +45,45 @@ dependencies {
     compileOnly('org.projectlombok:lombok')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }
+
+jooq {
+    sample(sourceSets.main) {
+        jdbc {
+            driver = 'org.h2.Driver'
+            url = 'jdbc:h2:~/build/h2db'
+            user = 'sa'
+            password = ''
+        }
+        generator {
+            name = 'org.jooq.util.DefaultGenerator'
+            strategy {
+                name = 'org.jooq.util.DefaultGeneratorStrategy'
+            }
+            database {
+                name = 'org.jooq.util.h2.H2Database'
+                inputSchema = 'public'
+            }
+            generate {
+                relations = true
+                deprecated = false
+                records = true
+                immutablePojos = false
+                fluentSetters = true
+            }
+            target {
+                packageName = 'com.ubs.fusa.code.review.automator.db'
+                directory = 'src/generated/java'
+            }
+        }
+    }
+}
+
+flyway {
+    url = 'jdbc:h2:~/build/h2db'
+    user = 'sa'
+    password = ''
+    locations = ["filesystem:$project.projectDir/src/main/resources/db/migration"]
+}
+
+generateSampleJooqSchemaSource.dependsOn flywayMigrate
+test.dependsOn flywayClean
