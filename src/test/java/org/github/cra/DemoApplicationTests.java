@@ -1,4 +1,4 @@
-package com.ubs.fusa;
+package org.github.cra;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -71,7 +71,7 @@ jooq {
                 fluentSetters = true
             }
             target {
-                packageName = 'com.ubs.fusa.code.review.automator.db'
+                packageName = 'org.gihub.cra.db'
                 directory = 'src/generated/java'
             }
         }
@@ -87,3 +87,7 @@ flyway {
 
 generateSampleJooqSchemaSource.dependsOn flywayMigrate
 test.dependsOn flywayClean
+
+clean.doFirst() {
+    delete "$project.projectDir/src/generated"
+}
