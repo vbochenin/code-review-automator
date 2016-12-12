@@ -31,6 +31,9 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://repo.spring.io/libs-milestone'
+    }
 }
 
 
@@ -41,6 +44,7 @@ dependencies {
     compile('org.flywaydb:flyway-core')
     compile('org.springframework.boot:spring-boot-starter-jooq')
     compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.social:spring-social-github:1.0.0.M4')
     runtime('com.h2database:h2')
     compileOnly('org.projectlombok:lombok')
     testCompile('org.springframework.boot:spring-boot-starter-test')
